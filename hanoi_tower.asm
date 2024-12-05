@@ -5,9 +5,9 @@ section .data
     torre_orig db   'A ', 0
     torre_aux db    'B ', 0
     torre_dest db   'C ', 0
-    msg_mov1 db     'Movimente o disco ', 0
-    msg_mov2 db     ' da torre ', 0
-    msg_mov3 db     'para a torre ', 0
+    msg_mov1 db     'Mova disco ', 0
+    msg_mov2 db     ' da Torre ', 0
+    msg_mov3 db     'para a Torre ', 0
     pular_linha db 10
     
 section .bss
