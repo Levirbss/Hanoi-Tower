@@ -7,10 +7,11 @@ def hanoi_solution(n_discs, origem = "A", auxiliar = "B", destino = "C"):
         print(f"Mova disco {n_discs} da Torre {origem} para a Torre {destino}")
         hanoi_solution(n_discs - 1, auxiliar, origem, destino)
 
-discos = int(input('Digite o número de discos (1 a 99):\n'))
+print('--------------\nTorre de Hanoi\n--------------')
+discos = int(input('Digite um número de discos (com no máximo 2 algarismos):'))
 
 print(f"Algoritmo da Torre de Hanoi com {discos} discos")
 
 hanoi_solution(discos)
 
-print("Concluido!")
+print("--------------\nConcluido!\n--------------")
