@@ -8,7 +8,7 @@ def hanoi_solution(n_discs, origem = "A", auxiliar = "B", destino = "C"):
         hanoi_solution(n_discs - 1, auxiliar, origem, destino)
 
 print('--------------\nTorre de Hanoi\n--------------')
-discos = int(input('Digite um número de discos (com no máximo 2 algarismos):'))
+discos = int(input('Digite o número de discos (com no máximo 2 algarismos):'))
 
 print(f"Algoritmo da Torre de Hanoi com {discos} discos")
 
