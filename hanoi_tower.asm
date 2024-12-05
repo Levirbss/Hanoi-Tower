@@ -92,7 +92,7 @@ converter_int_string:     ; Função que converte inteiros para string
     dec edi               ; Decrementa o conteúdo do registrador EDI para começar pelo bit menos significativo
     xor edx, edx          ; zerando o registrador EDX para armazenar o resto da div
     mov ecx, 10           ;  Move o valor 10 para o registrador ECX
-    div ecx               ; Divide o valor contido nos registradores EDX:EAX por 10. O quociente é armazenado em EAX, e o resto em EDX.
+    div ecx               ; Divide o valor contido nos registradores EDX:EAX por 10. O quociente é armazenado em EDX, e o resto em EAX.
     add dl, '0'           ; converte o dígito numérico para seu equivalente ASCII
     mov [edi], dl         ; Armazena o caractere convertido no endereço de memória apontado por EDI
     test eax, eax         ; Testa se o valor em EAX (quociente da divisão) é zero, se for é porque o número só tem 1 algarismo
