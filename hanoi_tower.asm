@@ -20,21 +20,30 @@ section .text
     global _start
     
 _start:
-    
-    mov ecx, msg_ini     ; Print da mensagem inicial
-    call print_fim_0       ; Chama a função para printar a msg
-    
-    call ler_input         ; Lendo apenas no máximo dois bytes, porque se houver dois algarismo e um Newline(ENTER) eu só quero os algarismos
-    
-    call conv_string_int ; Convertendo a minha entrada para um número inteiro para poder realizar as operações
-    
-    mov [num_disc], edx  ; Guarda o valor em int no ondereço que reservei para o número de discos
-    
-    call torre_hanoi     ; Chamando o subprocedimento principal
-    
-    mov eax, 1           ; Finzalizando o programa
+    ; Mensagem inicial
+    mov ecx, msg_ini     
+    call print_fim_0     
+
+    ; Entrada do usuário
+    call ler_input         
+    call conv_string_int   
+    mov [num_disc], edx    
+
+    ; Inicialização para Torre de Hanói
+    mov eax, torre_dest
+    push eax            ; Torre de destino
+    mov eax, torre_aux
+    push eax            ; Torre auxiliar
+    mov eax, torre_orig
+    push eax            ; Torre de origem
+    mov eax, [num_disc]
+    push eax            ; Número de discos
+    call torre_hanoi
+
+    ; Finalizando o programa
+    mov eax, 1           
     xor ebx, ebx
-    int 0x80   
+    int 0x80
 
 ler_input:              ; Ler a string do usuário
     mov ecx, input      ; Lendo
@@ -43,6 +52,7 @@ ler_input:              ; Ler a string do usuário
     mov edx, 2          ; Tamanho máximo de entrada
     int 0x80            ; Chamando Kernel 
     ret                 ; Retorno
+    
 print_fim_0:                   ; Print para quando a string termina em 0 para printar sem as msg "sem saber" o tamanho delas
     loop_print:
         mov al, byte[ecx]          ; Carregar o primeiro
@@ -54,12 +64,14 @@ print_fim_0:                   ; Print para quando a string termina em 0 para pr
 
     end_print:                  ; Saída do loop
         ret                     ; Retorno
+        
 print_ecx:          ; Printa a string que armazenei em ecx na chamada da função
     mov eax, 4      ; Chamada de sistema Write
     mov ebx, 1      ; Chamada Sys_out
     mov edx, 1      ; Tamanho do caractere
     int 0x80
     ret             ; Retorna pro ponto onde foi chamada
+    
 print_disc:
     movzx eax, byte [num_disc] ; Move o byte endereçado em num_disc para o registrador EAX estendendo através do movzx de 8 bits para 32, para realizar as instruções subsequentes como a div
     lea edi, [len_buffer]      ; Carrega o endereço de memória apontado por EDI
@@ -73,6 +85,7 @@ print_disc:
     sub edx, ecx            ; Calcula o comprimento da string subtraindo os endereços (endereço final - endereço inicial = número de bits da string)
     int 0x80                ; Chamar interrupção do sistema
     ret
+    
 conv_string_int:
     mov edx, input[0]     ; Carrega o primeiro caractere em edx
     sub edx, '0'          ; Converte de ASCII para número (0-9)
@@ -98,6 +111,7 @@ converter_int_string:     ; Função que converte inteiros para string
     test eax, eax         ; Testa se o valor em EAX (quociente da divisão) é zero, se for é porque o número só tem 1 algarismo
     jnz converter_int_string ; Se não for zero, pula para a próxima iteração
     ret ; Retorno
+    
 torre_hanoi:
     cmp byte [num_disc], 1  ; Caso base da recursão vendo se so tem 1 disco
     je caso_base            ; Se sim salta para o subprocedimento necessário
