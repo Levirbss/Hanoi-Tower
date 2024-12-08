@@ -7,7 +7,7 @@ section .data
     torre_dest db   'C ', 0
     msg_mov1 db     'Mova disco ', 0
     msg_mov2 db     ' da Torre ', 0
-    msg_mov3 db     ' para a Torre ', 0
+    msg_mov3 db     'para a Torre ', 0
     pular_linha db 10
 section .bss
     input resb 3      ; Buffer para armazenar a entrada do usuário (um ou dois               dígitos + quebra de linha)
