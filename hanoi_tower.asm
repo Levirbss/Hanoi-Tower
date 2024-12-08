@@ -1,7 +1,7 @@
 section .data
     ; Inicializando as strings que serão usadas todas prosseguidas por um 0 para usarmos como uma forma de imprimir a mensagem sem precisar especificar o número de bits que ela ocupa
     msg_ini db '--------------', 10, 'Torre de Hanoi', 10, '--------------', 10, 'Digite um número de discos (com no máximo 2 algarismos):', 0
-    msg_final db '---------------', 10, 'Hanoi concluída', 10, '---------------', 0
+    msg_final db '---------------', 10, 'Concluido!', 10, '---------------', 0
     torre_orig db   'A ', 0
     torre_aux db    'B ', 0
     torre_dest db   'C ', 0
