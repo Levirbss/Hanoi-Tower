@@ -5,9 +5,9 @@ section .data
     torre_orig db   'A ', 0
     torre_aux db    'B ', 0
     torre_dest db   'C ', 0
-    msg_mov1 db     'Movimente o disco ', 0
-    msg_mov2 db     ' da torre ', 0
-    msg_mov3 db     'para a torre ', 0
+    msg_mov1 db     'Mova disco ', 0
+    msg_mov2 db     ' da Torre ', 0
+    msg_mov3 db     ' para a Torre ', 0
     pular_linha db 10
 section .bss
     input resb 3      ; Buffer para armazenar a entrada do usuário (um ou dois               dígitos + quebra de linha)
@@ -32,6 +32,9 @@ _start:
     mov [num_disc], eax  ; Guarda o valor em int no ondereço que reservei para o número de discos
     
     call torre_hanoi     ; Chamando o subprocedimento principal
+    
+    mov ecx, msg_final
+    call print_fim_0
     
     mov eax, 1           ; Finzalizando o programa
     xor ebx, ebx
@@ -100,6 +103,7 @@ converter_int_string:     ; Função que converte inteiros para string
     test eax, eax         ; Testa se o valor em EAX (quociente da divisão) é zero, se for é porque o número só tem 1 algarismo
     jnz converter_int_string ; Se não for zero, pula para a próxima iteração
     ret ; Retorno
+
 torre_hanoi:
     cmp byte [num_disc], 1  ; Caso base da recursão vendo se so tem 1 disco
     je caso_base            ; Se sim salta para o subprocedimento necessário
@@ -129,58 +133,57 @@ torre_hanoi:
         jmp concluido        ; Pulando para o final para printar a msg e retornar pro programa principal
         
     caso_recursivo:
-        dec byte [num_disc]     ; Decrementa contador de discos
-    
-        push word [num_disc]    ; Salva contador na pilha
-        push word [torre_orig]  ; Salva colunas na pilha
-        push word [torre_aux] 
-        push word [torre_dest]
-    
-        ; Troca colunas auxiliar e destino
-        mov dx, [torre_aux] 
-        mov cx, [torre_dest]
-        mov [torre_dest], dx
-        mov [torre_aux], cx
-    
-        call torre_hanoi        ; Chama recursivamente
-    
-        pop word [torre_dest]  ; Restaura colunas da pilha
-        pop word [torre_aux]
-        pop word [torre_orig]
-    
-        pop word [num_disc]     ; Restaura contador da pilha
-    
-        mov ecx, msg_mov1 ; Carrega mensagem de movimento
-        call print_fim_0                 ; Exibe mensagem de movimento
-    
-        inc byte [num_disc]     ; Incrementa temporariamente para exibir
-        call print_disc       ; Exibe número do disco
-        dec byte [num_disc]     ; Decrementa de volta
-    
-        mov ecx, msg_mov2   ; Carrega mensagem "da coluna"
-        call print_fim_0         ; Exibe mensagem "da coluna"
-    
-        mov ecx, torre_orig      ; Carrega nome da coluna origem
-        call print_fim_0         ; Exibe nome da coluna origem
-    
-        mov ecx, msg_mov3 ; Carrega mensagem "para a coluna"
-        call print_fim_0       ; Exibe mensagem "para a coluna"
-    
-        mov ecx, torre_dest     ; Carrega nome da coluna destino
-        call print_fim_0         ; Exibe nome da coluna destino
-    
-        mov ecx, pular_linha    ; Carrega nova linha
-        call print_ecx  ; Exibe nova linha
-    
-        ; Troca colunas auxiliar e origem
-        mov dx, [torre_aux]
-        mov cx, [torre_orig]
-        mov [torre_orig], dx
-        mov [torre_aux], cx
-    
-        call torre_hanoi        ; Chama recursivamente
+        
+        dec byte [num_disc] ; Decrescimento na quantidade de discos
+        
+        push word [num_disc] ; Coloca o valor da quantidade atual de discos na pilha, para a primeira recursão e suas "filhas" não interferirem na chamada atual da função
+
+        push word [torre_orig] ; Coloca o valor de coluna origem na pilha, para as recursões futuras não influenciarem nos valores da chamada atual da função
+        push word [torre_aux] ; Coloca o valor de coluna auxiliar na pilha, para as recursões futuras não influenciarem nos valores da chamada atual da função
+        push word [torre_dest] ; Coloca o valor de coluna destino na pilha, para as recursões futuras não influenciarem nos valores da chamada atual da função
+        
+        ; Trocando o valor da coluna auxiliar com o valor da coluna de destino
+        mov dx, [torre_aux] ; Armazena o valor da coluna auxiliar no registrador dx
+        mov cx, [torre_dest] ; Armazena o valor da coluna destino no registrador cx
+        mov [torre_dest], dx ; Move o valor de dx(coluna auxiliar) para a coluna destino
+        mov [torre_aux], cx ; Move o valor de cx(coluna destino) para a coluna auxiliar
+        
+        call torre_hanoi ; Recursão
+        
+        pop word [torre_dest] ; Obtém o valor de coluna destino na pilha, para as recursões passadas não influenciarem nos valores da chamada atual da função
+        pop word [torre_aux] ; Obtém o valor de coluna auxiliar na pilha, para as recursões passadas não influenciarem nos valores da chamada atual da função
+        pop word [torre_orig] ; Obtém o valor de coluna origem na pilha, para as recursões passadas não influenciarem nos valores da chamada atual da função
+        
+        pop word [num_disc] ; Obtém o valor guardado na pilha, para que as recursões anteriores não interfiram na recursão abaixo
+        
+        mov ecx, msg_mov1 ; Armazenar string em ecx
+        call print_fim_0 ; Printar o que está em ecx
+        
+        inc byte [num_disc] ; Aumento da quantidade de discos para o decréscimo anterior não influenciar na exibição do valor do disco que será movido
+        call print_disc ; Função que exibe a quantidade de discos atual, que também é o disco que está sendo movido, assumindo que o disco 1 é o menor e o número vai crescendo de acordo com o tamanho do disco
+        dec byte [num_disc] ; Decréscimo para retornar o valor anterior ao acréscimo que foi feito anteriormente
+        
+        mov ecx, msg_mov2 ; Armazenar string em ecx
+        call print_fim_0 ; Printar o que está em ecx
+        
+        mov ecx, torre_orig ; Move o valor da coluna origem para ecx
+        call print_fim_0 ; Printar o que está em ecx
+        
+        mov ecx, msg_mov3 ; Armazenar string em ecx
+        call print_fim_0 ; Printar o que está em ecx
+        
+        mov ecx, torre_dest ; Move o valor da destino origem para ecx
+        call print_fim_0 ; Printar o que está em ecx
+        
+        mov ecx, pular_linha ; Armazenar string em ecx, neste caso é uma quebra de linha
+        call print_ecx ; Printar o que está em ecx
+        
+        ; Trocando o valor da coluna auxiliar com o valor da coluna de origem
+        mov dx, [torre_aux] ; Armazena o valor da coluna auxiliar no registrador dx
+        mov cx, [torre_orig] ; Armazena o valor da coluna origem no registrador cx
+        mov [torre_orig], dx ; Move o valor de cx(coluna origem) para a coluna auxiliar
+        mov [torre_aux], cx ; Move o valor de cx(coluna auxiliar) para a coluna origem
+        call torre_hanoi ; Recursão
     
     concluido:
-        mov ecx, msg_final
-        call print_fim_0
-    ret
+        ret
