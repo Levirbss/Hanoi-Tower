@@ -1,29 +1,57 @@
 section .data
-    ; Inicializando as strings que serão usadas todas prosseguidas por um 0 para usarmos como uma forma de imprimir a mensagem sem precisar especificar o número de bits que ela ocupa
-    msg_ini db '--------------', 10, 'Torre de Hanoi', 10, '--------------', 10, 'Digite um número de discos (com no máximo 2 algarismos):', 0
-    msg_final db '---------------', 10, 'Concluido!', 10, '---------------', 0
-    msg_alg1 db 'Algoritmo da Torre de Hanoi com ', 0
-    msg_alg2 db ' discos', 10, 0
-    torre_orig db   'A ', 0
-    torre_aux db    'B ', 0
-    torre_dest db   'C ', 0
-    msg_mov1 db     'Mova disco ', 0
-    msg_mov2 db     ' da Torre ', 0
-    msg_mov3 db     'para a Torre ', 0
+    ; Inicializando as strings que serão usadas
+    msg_ini1 db '--------------', 10
+    len_msg_ini1 equ $ - msg_ini1
+    msg_ini2 db 'Torre de Hanoi', 10
+    len_msg_ini2 equ $ - msg_ini2
+    msg_ini3 db '--------------', 10
+    len_msg_ini3 equ $ - msg_ini3
+    msg_ini4 db 'Digite um número de discos (com no máximo 2 algarismos):'
+    len_msg_ini4 equ $ - msg_ini4
+    msg_final db '---------------', 10, 'Concluido!', 10, '---------------'
+    len_msg_final equ $ - msg_final
+    msg_alg1 db 'Algoritmo da Torre de Hanoi com '
+    len_msg_alg1 equ $ - msg_alg1
+    msg_alg2 db ' discos', 10
+    len_msg_alg2 equ $ - msg_alg2
+    torre_orig db 'A '
+    len_torre_orig equ $ - torre_orig
+    torre_aux db 'B '
+    len_torre_aux equ $ - torre_aux
+    torre_dest db 'C '
+    len_torre_dest equ $ - torre_dest
+    msg_mov1 db 'Mova disco '
+    len_msg_mov1 equ $ - msg_mov1
+    msg_mov2 db ' da Torre '
+    len_msg_mov2 equ $ - msg_mov2
+    msg_mov3 db 'para a Torre '
+    len_msg_mov3 equ $ - msg_mov3
     pular_linha db 10
+    len_pular_linha equ $ - pular_linha
+
 section .bss
-    input resb 3      ; Buffer para armazenar a entrada do usuário (um ou dois               dígitos + quebra de linha)
+    input resb 3      ; Buffer para armazenar a entrada do usuário (um ou dois dígitos + quebra de linha)
     num_disc resb 1   ; Armazenamento do número de discos
     len_buffer resb 2 ; Buffer para armazenar a comprimento da string
-    
+
 section .text
 
     global _start
     
 _start:
-    
-    mov ecx, msg_ini     ; Print da mensagem inicial
-    call print_fim_0       ; Chama a função para printar a msg
+    ; Print da mensagem inicial dividida em várias partes
+    mov ecx, msg_ini1
+    mov edx, len_msg_ini1
+    call print_string
+    mov ecx, msg_ini2
+    mov edx, len_msg_ini2
+    call print_string
+    mov ecx, msg_ini3
+    mov edx, len_msg_ini3
+    call print_string
+    mov ecx, msg_ini4
+    mov edx, len_msg_ini4
+    call print_string
     
     call ler_input         ; Lendo apenas no máximo dois bytes, porque se houver dois algarismo e um Newline(ENTER) eu só quero os algarismos
     lea esi, [input]
@@ -34,17 +62,20 @@ _start:
     mov [num_disc], eax  ; Guarda o valor em int no ondereço que reservei para o número de discos
     
     mov ecx, msg_alg1     ; Print da mensagem inicial
-    call print_fim_0       ; Chama a função para printar a msg
+    mov edx, len_msg_alg1
+    call print_string       ; Chama a função para printar a msg
     
     call print_disc
     
     mov ecx, msg_alg2     ; Print da mensagem inicial
-    call print_fim_0       ; Chama a função para printar a msg    
+    mov edx, len_msg_alg2
+    call print_string       ; Chama a função para printar a msg    
     
     call torre_hanoi     ; Chamando o subprocedimento principal
     
     mov ecx, msg_final
-    call print_fim_0
+    mov edx, len_msg_final
+    call print_string
     
     mov eax, 1           ; Finzalizando o programa
     xor ebx, ebx
@@ -57,23 +88,13 @@ ler_input:              ; Ler a string do usuário
     mov edx, 2          ; Tamanho máximo de entrada
     int 0x80            ; Chamando Kernel 
     ret                 ; Retorno
-print_fim_0:                   ; Print para quando a string termina em 0 para printar sem as msg "sem saber" o tamanho delas
-    loop_print:
-        mov al, byte[ecx]          ; Carregar o primeiro
-        cmp al, 0               ; Verificar se é o final da string
-        je end_print            ; Se for, sair da função
-        call print_ecx        ; Se não chama o subprocedimento de print que não se preocupa com o final 0
-        inc ecx                 ; Move para o próximo caractere
-        jmp loop_print          ; Repete o loop
 
-    end_print:                  ; Saída do loop
-        ret                     ; Retorno
-print_ecx:          ; Printa a string que armazenei em ecx na chamada da função
-    mov eax, 4      ; Chamada de sistema Write
-    mov ebx, 1      ; Chamada Sys_out
-    mov edx, 1      ; Tamanho do caractere
+print_string:          ; Printa a string que armazenei em ecx na chamada da função
+    mov eax, 4         ; Chamada de sistema Write
+    mov ebx, 1         ; Chamada Sys_out
     int 0x80
-    ret             ; Retorna pro ponto onde foi chamada
+    ret                ; Retorna pro ponto onde foi chamada
+
 print_disc:
     movzx eax, byte [num_disc] ; Move o byte endereçado em num_disc para o registrador EAX estendendo através do movzx de 8 bits para 32, para realizar as instruções subsequentes como a div
     lea edi, [len_buffer + 4]      ; Carrega o endereço de memória apontado por EDI
@@ -87,8 +108,8 @@ print_disc:
     sub edx, ecx            ; Calcula o comprimento da string subtraindo os endereços (endereço final - endereço inicial = número de bits da string)
     int 0x80                ; Chamar interrupção do sistema
     ret
-string_to_int:
 
+string_to_int:
     xor ebx, ebx
     prox_digito:
         cmp byte[esi], 0x0A         ; Verifica se é newline (ENTER)
@@ -121,24 +142,30 @@ torre_hanoi:
     
     caso_base:
         mov ecx, msg_mov1   ; Movendo para ecx 'Movimente o disco '
-        call print_fim_0
+        mov edx, len_msg_mov1
+        call print_string
         
         call print_disc     ; Printando o disco 1
         
         mov ecx, msg_mov2   ; Movendo para ecx ' da torre '
-        call print_fim_0
+        mov edx, len_msg_mov2
+        call print_string
         
         mov ecx, torre_orig ; Movendo para ecx a torre de origem no momento
-        call print_fim_0
+        mov edx, len_torre_orig
+        call print_string
         
         mov ecx, msg_mov3   ; Movendo para ecx ' para a torre '
-        call print_fim_0
+        mov edx, len_msg_mov3
+        call print_string
         
         mov ecx, torre_dest ; Movendo para ecx a torre de destino no momento
-        call print_fim_0
+        mov edx, len_torre_dest
+        call print_string
         
         mov ecx, pular_linha ; Movendo para ecx a quebra de linha para continuar os prints
-        call print_ecx
+        mov edx, len_pular_linha
+        call print_string
         
         jmp concluido        ; Pulando para o final para printar a msg e retornar pro programa principal
         
@@ -167,26 +194,32 @@ torre_hanoi:
         pop word [num_disc] ; Obtém o valor guardado na pilha, para que as recursões anteriores não interfiram na recursão abaixo
         
         mov ecx, msg_mov1 ; Armazenar string em ecx
-        call print_fim_0 ; Printar o que está em ecx
+        mov edx, len_msg_mov1
+        call print_string
         
         inc byte [num_disc] ; Aumento da quantidade de discos para o decréscimo anterior não influenciar na exibição do valor do disco que será movido
         call print_disc ; Função que exibe a quantidade de discos atual, que também é o disco que está sendo movido, assumindo que o disco 1 é o menor e o número vai crescendo de acordo com o tamanho do disco
         dec byte [num_disc] ; Decréscimo para retornar o valor anterior ao acréscimo que foi feito anteriormente
         
         mov ecx, msg_mov2 ; Armazenar string em ecx
-        call print_fim_0 ; Printar o que está em ecx
+        mov edx, len_msg_mov2
+        call print_string
         
         mov ecx, torre_orig ; Move o valor da coluna origem para ecx
-        call print_fim_0 ; Printar o que está em ecx
+        mov edx, len_torre_orig
+        call print_string
         
         mov ecx, msg_mov3 ; Armazenar string em ecx
-        call print_fim_0 ; Printar o que está em ecx
+        mov edx, len_msg_mov3
+        call print_string
         
         mov ecx, torre_dest ; Move o valor da destino origem para ecx
-        call print_fim_0 ; Printar o que está em ecx
+        mov edx, len_torre_dest
+        call print_string
         
         mov ecx, pular_linha ; Armazenar string em ecx, neste caso é uma quebra de linha
-        call print_ecx ; Printar o que está em ecx
+        mov edx, len_pular_linha
+        call print_string
         
         ; Trocando o valor da coluna auxiliar com o valor da coluna de origem
         mov dx, [torre_aux] ; Armazena o valor da coluna auxiliar no registrador dx
