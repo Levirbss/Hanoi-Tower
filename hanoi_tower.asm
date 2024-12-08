@@ -1,39 +1,3 @@
-section .data
-    ; Inicializando as strings que serão usadas
-    msg_ini1 db '--------------', 10
-    len_msg_ini1 equ $ - msg_ini1
-    msg_ini2 db 'Torre de Hanoi', 10
-    len_msg_ini2 equ $ - msg_ini2
-    msg_ini3 db '--------------', 10
-    len_msg_ini3 equ $ - msg_ini3
-    msg_ini4 db 'Digite um número de discos (com no máximo 2 algarismos):'
-    len_msg_ini4 equ $ - msg_ini4
-    msg_final db '---------------', 10, 'Concluido!', 10, '---------------'
-    len_msg_final equ $ - msg_final
-    msg_alg1 db 'Algoritmo da Torre de Hanoi com '
-    len_msg_alg1 equ $ - msg_alg1
-    msg_alg2 db ' discos', 10
-    len_msg_alg2 equ $ - msg_alg2
-    torre_orig db 'A '
-    len_torre_orig equ $ - torre_orig
-    torre_aux db 'B '
-    len_torre_aux equ $ - torre_aux
-    torre_dest db 'C '
-    len_torre_dest equ $ - torre_dest
-    msg_mov1 db 'Mova disco '
-    len_msg_mov1 equ $ - msg_mov1
-    msg_mov2 db ' da Torre '
-    len_msg_mov2 equ $ - msg_mov2
-    msg_mov3 db 'para a Torre '
-    len_msg_mov3 equ $ - msg_mov3
-    pular_linha db 10
-    len_pular_linha equ $ - pular_linha
-
-section .bss
-    input resb 3      ; Buffer para armazenar a entrada do usuário (um ou dois dígitos + quebra de linha)
-    num_disc resb 1   ; Armazenamento do número de discos
-    len_buffer resb 2 ; Buffer para armazenar a comprimento da string
-
 section .text
 
     global _start
@@ -53,7 +17,8 @@ _start:
     mov edx, len_msg_ini4
     call print_string
     
-    call ler_input         ; Lendo apenas no máximo dois bytes, porque se houver dois algarismo e um Newline(ENTER) eu só quero os algarismos
+    ; Lendo apenas no máximo dois bytes, porque se houver dois algarismo e um Newline(ENTER) eu só quero os algarismos
+    call ler_input         
     lea esi, [input]
     mov ecx, 0x2
     
@@ -96,7 +61,7 @@ print_string:          ; Printa a string que armazenei em ecx na chamada da fun�
     ret                ; Retorna pro ponto onde foi chamada
 
 print_disc:
-    movzx eax, byte [num_disc] ; Move o byte endereçado em num_disc para o registrador EAX estendendo através do movzx de 8 bits para 32, para realizar as instruções subsequentes como a div
+    movzx eax, byte [num_disc] ; Move o byte endereçado em num_disc para o registrador EAX 
     lea edi, [len_buffer + 4]      ; Carrega o endereço de memória apontado por EDI
 
     call converter_int_string  ; Chama o subprocedimento para tranformar o caractere em string através da tabela ASCII
@@ -230,3 +195,38 @@ torre_hanoi:
     
     concluido:
         ret
+section .data
+    ; Inicializando as strings que serão usadas
+    msg_ini1 db '---------------', 10
+    len_msg_ini1 equ $ - msg_ini1
+    msg_ini2 db 'Torre de Hanoi', 10
+    len_msg_ini2 equ $ - msg_ini2
+    msg_ini3 db '---------------', 10
+    len_msg_ini3 equ $ - msg_ini3
+    msg_ini4 db 'Digite um número de discos (com no máximo 2 algarismos):'
+    len_msg_ini4 equ $ - msg_ini4
+    msg_final db '----------------', 10, '   Concluido!', 10, '----------------'
+    len_msg_final equ $ - msg_final
+    msg_alg1 db 'Algoritmo da Torre de Hanoi com '
+    len_msg_alg1 equ $ - msg_alg1
+    msg_alg2 db ' discos', 10
+    len_msg_alg2 equ $ - msg_alg2
+    torre_orig db 'A '
+    len_torre_orig equ $ - torre_orig
+    torre_aux db 'B '
+    len_torre_aux equ $ - torre_aux
+    torre_dest db 'C '
+    len_torre_dest equ $ - torre_dest
+    msg_mov1 db 'Mova disco '
+    len_msg_mov1 equ $ - msg_mov1
+    msg_mov2 db ' da Torre '
+    len_msg_mov2 equ $ - msg_mov2
+    msg_mov3 db 'para a Torre '
+    len_msg_mov3 equ $ - msg_mov3
+    pular_linha db 10
+    len_pular_linha equ $ - pular_linha
+
+section .bss
+    input resb 3      ; Buffer para armazenar a entrada do usuário (um ou dois dígitos + quebra de linha)
+    num_disc resb 1   ; Armazenamento do número de discos
+    len_buffer resb 2 ; Buffer para armazenar a comprimento da string
