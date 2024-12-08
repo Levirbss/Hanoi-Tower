@@ -29,15 +29,6 @@ _start:
     call conv_string_int   
     mov [num_disc], edx    
 
-    ; Inicialização para Torre de Hanói
-    mov eax, torre_dest  ; "C"
-    push eax             ; Pilha: [C]
-    mov eax, torre_aux   ; "B"
-    push eax             ; Pilha: [B, C]
-    mov eax, torre_orig  ; "A"
-    push eax             ; Pilha: [A, B, C]
-    mov eax, [num_disc]  ; Número de discos
-    push eax             ; Pilha: [num_disc, A, B, C]
     call torre_hanoi
 
     ; Finalizando o programa
