@@ -30,14 +30,14 @@ _start:
     mov [num_disc], edx    
 
     ; Inicialização para Torre de Hanói
-    mov eax, torre_dest
-    push eax            ; Torre de destino
-    mov eax, torre_aux
-    push eax            ; Torre auxiliar
-    mov eax, torre_orig
-    push eax            ; Torre de origem
-    mov eax, [num_disc]
-    push eax            ; Número de discos
+    mov eax, torre_dest  ; "C"
+    push eax             ; Pilha: [C]
+    mov eax, torre_aux   ; "B"
+    push eax             ; Pilha: [B, C]
+    mov eax, torre_orig  ; "A"
+    push eax             ; Pilha: [A, B, C]
+    mov eax, [num_disc]  ; Número de discos
+    push eax             ; Pilha: [num_disc, A, B, C]
     call torre_hanoi
 
     ; Finalizando o programa
