@@ -2,6 +2,8 @@ section .data
     ; Inicializando as strings que serão usadas todas prosseguidas por um 0 para usarmos como uma forma de imprimir a mensagem sem precisar especificar o número de bits que ela ocupa
     msg_ini db '--------------', 10, 'Torre de Hanoi', 10, '--------------', 10, 'Digite um número de discos (com no máximo 2 algarismos):', 0
     msg_final db '---------------', 10, 'Concluido!', 10, '---------------', 0
+    msg_alg1 db 'Algoritmo da Torre de Hanoi com ', 0
+    msg_alg2 db ' discos', 10, 0
     torre_orig db   'A ', 0
     torre_aux db    'B ', 0
     torre_dest db   'C ', 0
@@ -30,6 +32,14 @@ _start:
     call string_to_int ; Convertendo a minha entrada para um número inteiro para poder realizar as operações
     
     mov [num_disc], eax  ; Guarda o valor em int no ondereço que reservei para o número de discos
+    
+    mov ecx, msg_alg1     ; Print da mensagem inicial
+    call print_fim_0       ; Chama a função para printar a msg
+    
+    call print_disc
+    
+    mov ecx, msg_alg2     ; Print da mensagem inicial
+    call print_fim_0       ; Chama a função para printar a msg    
     
     call torre_hanoi     ; Chamando o subprocedimento principal
     
