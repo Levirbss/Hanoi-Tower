@@ -15,30 +15,29 @@ _start:
     mov edx, len_msg_ini4
     call print_string
     
-    ; Lendo apenas 2 dígitos (podendo ser uma NewLine) da entrada do usuário e usando o registrador ESI como apontador para acessar a memória
-    call ler_input         
-    lea esi, [input]
-    mov ecx, 0x2
+    call ler_input         ; Lendo apenas 2 dígitos (podendo ser uma NewLine) da entrada do usuário
+    lea esi, [input]       ; Usando o registrador ESI como apontador para acessar a memória
+    mov ecx, 0x2           ; Definindo que vou tratar dois caracteres para o loop que vou usar na função abaixo
     
     call string_to_int     ; Convertendo a entrada para um número inteiro para poder realizar as operações
     
     mov [num_disc], eax    ; Guarda o valor em int no ondereço que reservei para o número de discos
     
-    mov ecx, msg_alg1      ; Print da mensagem inicial
-    mov edx, len_msg_alg1  
+    mov ecx, msg_alg1      ; Carrega a mensagem inicial
+    mov edx, len_msg_alg1  ; Comprimento da mensagem
     call print_string      ; Chama a função para printar a msg
     
     call print_disc        ; Chamando a função para printar o símbolo ASCII guardado como int
     
-    mov ecx, msg_alg2      ; Print da mensagem inicial
-    mov edx, len_msg_alg2
-    call print_string      ; Chama a função para printar a msg    
+    mov ecx, msg_alg2      ; Carrega a mensagem inicial
+    mov edx, len_msg_alg2  ; Comprimento da mensagem
+    call print_string      ; Chama a função para printar a msg   
     
     call torre_hanoi       ; Chamando o subprocedimento principal
     
-    mov ecx, msg_final     ; Printando a mensagens final do programa
-    mov edx, len_msg_final
-    call print_string
+    mov ecx, msg_final     ; Carrega a mensagem final
+    mov edx, len_msg_final ; Comprimento da mensagem
+    call print_string      ; Chama a função para printar a msg
     
     mov eax, 1             ; Finzalizando o programa
     xor ebx, ebx
@@ -60,14 +59,14 @@ print_string:          ; Printa a string que armazenei em ecx na chamada da fun�
 
 print_disc:
     movzx eax, byte [num_disc]   ; Move o byte endereçado em num_disc para o registrador EAX extendido em 32 bits para realizar as operações aritméticas com os registradores de 32 bits 
-    lea edi, [buffer + 4]            ; Aponta EDI para o buffer que vou "escrever" os bits da string 
+    lea edi, [buffer + 4]        ; Aponta EDI para o buffer que vou "escrever" os bits da string 
 
     call int_to_string           ; Chama o subprocedimento para tranformar o caractere em string através da tabela ASCII
     
     mov eax, 4                   ; Número da chamada de sistema para imprimir
     mov ebx, 1                   ; Descritor de arquivo (stdout)
     lea ecx, [edi]               ; Carrega o endereço inicial da string convertida em ECX 
-    lea edx, [buffer + 4]            ; Carrega o endereço final do buffer no registrador EDX
+    lea edx, [buffer + 4]        ; Carrega o endereço final do buffer no registrador EDX
     sub edx, edi                 ; Calcula o comprimento da string subtraindo os endereços (endereço final - endereço inicial = número de bits da string)
     int 0x80                     ; Chamar interrupção do sistema
     ret
@@ -79,7 +78,7 @@ string_to_int:
         je um_algarismo            ; Se for '\n', termina a conversão e vai para o fim
         movzx eax, byte [esi]      ; Carrega o caractere atual (1 byte) no registrador `eax`, expandindo com zeros
         inc esi                    ; Move o ponteiro `esi` para o próximo caractere
-        sub al, '0'                ; Converte o caractere ASCII em seu valor numérico (ex.: '3' -> 3)
+        sub al, '0'                ; Converte o caractere ASCII em seu valor numérico 
         imul ebx, 0xA              ; Multiplica o valor acumulado em `ebx` por 10 (desloca para a esquerda em base decimal)
         add ebx, eax               ; Adiciona o novo dígito convertido ao acumulador `ebx`
         loop prox_digito           ; Continua o loop enquanto o contador (ECX) não for zero
@@ -111,33 +110,34 @@ torre_hanoi:
     jmp caso_recursivo      ; Senão salta para o subprocedimento que continnua a recursão
     
     caso_base:
-        mov ecx, msg_mov1   ; Movendo para ecx 'Movimente o disco '
-        mov edx, len_msg_mov1
-        call print_string
+        ; Imprime a mensagem "Mova disco X da Torre Y para a Torre Z"
+        mov ecx, msg_mov1              ; Carrega a mensagem inicial "Mova disco"
+        mov edx, len_msg_mov1          ; Comprimento da mensagem
+        call print_string              ; Imprime a mensagem "Mova disco"
         
-        call print_disc     ; Printando o disco 1
+        call print_disc                ; Printando o disco 1
         
-        mov ecx, msg_mov2   ; Movendo para ecx ' da torre '
-        mov edx, len_msg_mov2
-        call print_string
+        mov ecx, msg_mov2              ; Carrega a mensagem "da Torre"
+        mov edx, len_msg_mov2          ; Comprimento da mensagem
+        call print_string              ; Imprime "da Torre"
         
-        mov ecx, torre_orig ; Movendo para ecx a torre de origem no momento
-        mov edx, len_torre_orig
-        call print_string
+        mov ecx, torre_orig            ; Carrega o identificador da torre de origem
+        mov edx, len_torre_orig        ; Comprimento do identificador
+        call print_string              ; Imprime o identificador da torre de origem
         
-        mov ecx, msg_mov3   ; Movendo para ecx ' para a torre '
-        mov edx, len_msg_mov3
-        call print_string
+        mov ecx, msg_mov3              ; Carrega a mensagem "para a Torre"
+        mov edx, len_msg_mov3          ; Comprimento da mensagem
+        call print_string              ; Imprime "para a Torre"
         
-        mov ecx, torre_dest ; Movendo para ecx a torre de destino no momento
-        mov edx, len_torre_dest
-        call print_string
+        mov ecx, torre_dest            ; Carrega o identificador da torre de destino
+        mov edx, len_torre_dest        ; Comprimento do identificador
+        call print_string              ; Imprime o identificador da torre de destino
         
-        mov ecx, pular_linha ; Movendo para ecx a quebra de linha para continuar os prints
-        mov edx, len_pular_linha
-        call print_string
+        mov ecx, pular_linha           ; Carrega a quebra de linha
+        mov edx, len_pular_linha       ; Comprimento da quebra de linha
+        call print_string              ; Imprime a quebra de linha
         
-        jmp concluido        ; Pulando para o final para printar a msg e retornar pro programa principal
+        jmp concluido                  ; Pulando para o subprocedimento de conclusão do algoritmo
         
     caso_recursivo:
         ; Diminui o número de discos em 1
