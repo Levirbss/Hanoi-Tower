@@ -1,7 +1,5 @@
 section .text
-
     global _start
-    
 _start:
     ; Print da mensagem inicial dividida em várias partes
     mov ecx, msg_ini1
@@ -17,39 +15,39 @@ _start:
     mov edx, len_msg_ini4
     call print_string
     
-    ; Lendo apenas no máximo dois bytes, porque se houver dois algarismo e um Newline(ENTER) eu só quero os algarismos
+    ; Lendo apenas 2 dígitos (podendo ser uma NewLine) da entrada do usuário e usando o registrador ESI como apontador para acessar a memória
     call ler_input         
     lea esi, [input]
     mov ecx, 0x2
     
-    call string_to_int ; Convertendo a minha entrada para um número inteiro para poder realizar as operações
+    call string_to_int     ; Convertendo a entrada para um número inteiro para poder realizar as operações
     
-    mov [num_disc], eax  ; Guarda o valor em int no ondereço que reservei para o número de discos
+    mov [num_disc], eax    ; Guarda o valor em int no ondereço que reservei para o número de discos
     
-    mov ecx, msg_alg1     ; Print da mensagem inicial
-    mov edx, len_msg_alg1
-    call print_string       ; Chama a função para printar a msg
+    mov ecx, msg_alg1      ; Print da mensagem inicial
+    mov edx, len_msg_alg1  
+    call print_string      ; Chama a função para printar a msg
     
-    call print_disc
+    call print_disc        ; Chamando a função para printar o símbolo ASCII guardado como int
     
-    mov ecx, msg_alg2     ; Print da mensagem inicial
+    mov ecx, msg_alg2      ; Print da mensagem inicial
     mov edx, len_msg_alg2
-    call print_string       ; Chama a função para printar a msg    
+    call print_string      ; Chama a função para printar a msg    
     
-    call torre_hanoi     ; Chamando o subprocedimento principal
+    call torre_hanoi       ; Chamando o subprocedimento principal
     
-    mov ecx, msg_final
+    mov ecx, msg_final     ; Printando a mensagens final do programa
     mov edx, len_msg_final
     call print_string
     
-    mov eax, 1           ; Finzalizando o programa
+    mov eax, 1             ; Finzalizando o programa
     xor ebx, ebx
     int 0x80   
 
 ler_input:              ; Ler a string do usuário
-    mov ecx, input      ; Lendo
     mov eax, 3          ; Número da chamada de sistema para ler
     mov ebx, 0          ; Descritor de arquivo (stdin)
+    mov ecx, input      ; Lendo o input
     mov edx, 2          ; Tamanho máximo de entrada
     int 0x80            ; Chamando Kernel 
     ret                 ; Retorno
@@ -57,48 +55,55 @@ ler_input:              ; Ler a string do usuário
 print_string:          ; Printa a string que armazenei em ecx na chamada da função
     mov eax, 4         ; Chamada de sistema Write
     mov ebx, 1         ; Chamada Sys_out
-    int 0x80
+    int 0x80           ; Chamando Kernel
     ret                ; Retorna pro ponto onde foi chamada
 
 print_disc:
-    movzx eax, byte [num_disc] ; Move o byte endereçado em num_disc para o registrador EAX 
-    lea edi, [len_buffer + 4]      ; Carrega o endereço de memória apontado por EDI
+    movzx eax, byte [num_disc]   ; Move o byte endereçado em num_disc para o registrador EAX extendido em 32 bits para realizar as operações aritméticas com os registradores de 32 bits 
+    lea edi, [buffer + 4]            ; Aponta EDI para o buffer que vou "escrever" os bits da string 
 
-    call converter_int_string  ; Chama o subprocedimento para tranformar o caractere em string através da tabela ASCII
+    call int_to_string           ; Chama o subprocedimento para tranformar o caractere em string através da tabela ASCII
     
-    mov eax, 4              ; Número da chamada de sistema para imprimir
-    mov ebx, 1              ; Descritor de arquivo (stdout)
-    lea ecx, [edi]          ; Carrega o endereço inicial da string convertida em ECX 
-    lea edx, [len_buffer + 4]   ; Carrega o endereço final do buffer no registrador EDX
-    sub edx, ecx            ; Calcula o comprimento da string subtraindo os endereços (endereço final - endereço inicial = número de bits da string)
-    int 0x80                ; Chamar interrupção do sistema
+    mov eax, 4                   ; Número da chamada de sistema para imprimir
+    mov ebx, 1                   ; Descritor de arquivo (stdout)
+    lea ecx, [edi]               ; Carrega o endereço inicial da string convertida em ECX 
+    lea edx, [buffer + 4]            ; Carrega o endereço final do buffer no registrador EDX
+    sub edx, edi                 ; Calcula o comprimento da string subtraindo os endereços (endereço final - endereço inicial = número de bits da string)
+    int 0x80                     ; Chamar interrupção do sistema
     ret
 
 string_to_int:
-    xor ebx, ebx
+    xor ebx, ebx                   ; Zera o acumulador `ebx` onde será formado o número inteiro
     prox_digito:
-        cmp byte[esi], 0x0A         ; Verifica se é newline (ENTER)
-        je um_algarismo       ; Se for ENTER, há apenas um dígito
-        movzx eax, byte[esi]
-        inc esi
-        sub al, '0'
-        imul ebx, 0xA
-        add ebx, eax
-        loop prox_digito
-        mov eax, ebx
+        cmp byte [esi], 0x0A       ; Verifica se o caractere atual é um '\n' (newline)
+        je um_algarismo            ; Se for '\n', termina a conversão e vai para o fim
+        movzx eax, byte [esi]      ; Carrega o caractere atual (1 byte) no registrador `eax`, expandindo com zeros
+        inc esi                    ; Move o ponteiro `esi` para o próximo caractere
+        sub al, '0'                ; Converte o caractere ASCII em seu valor numérico (ex.: '3' -> 3)
+        imul ebx, 0xA              ; Multiplica o valor acumulado em `ebx` por 10 (desloca para a esquerda em base decimal)
+        add ebx, eax               ; Adiciona o novo dígito convertido ao acumulador `ebx`
+        loop prox_digito           ; Continua o loop enquanto o contador (ECX) não for zero
+        mov eax, ebx               ; Move o valor final acumulado em `ebx` para `eax` (registrador de retorno padrão)
     um_algarismo:
-        ret
+        ret                        ; Retorna ao chamador com o número convertido em `eax`
         
-converter_int_string:     ; Função que converte inteiros para string
-    dec edi               ; Decrementa o conteúdo do registrador EDI para começar pelo bit menos significativo
-    xor edx, edx          ; zerando o registrador EDX para armazenar o resto da div
-    mov ecx, 10           ;  Move o valor 10 para o registrador ECX
-    div ecx               ; Divide o valor contido nos registradores EDX:EAX por 10. O quociente é armazenado em EAX, e o resto em EDX.
-    add dl, '0'           ; converte o dígito numérico para seu equivalente ASCII
-    mov [edi], dl         ; Armazena o caractere convertido no endereço de memória apontado por EDI
-    test eax, eax         ; Testa se o valor em EAX (quociente da divisão) é zero, se for é porque o número só tem 1 algarismo
-    jnz converter_int_string ; Se não for zero, pula para a próxima iteração
-    ret ; Retorno
+int_to_string:
+    xor ecx, ecx             ; ECX será usado como contador de dígitos
+    xor edx, edx             ; Limpa EDX para divisão
+    mov ebx, 10              ; Divisor decimal para extrair dígitos
+
+    convert_loop:
+        xor edx, edx         ; Limpa registrado de resto da divisão
+        div ebx              ; Divide EAX por 10 (EAX = quociente, EDX = resto)
+        add dl, '0'          ; Converte o dígito para ASCII
+        dec edi              ; Move para o próximo espaço no buffer (de trás para frente)
+        mov [edi], dl        ; Armazena o dígito no buffer
+        inc ecx              ; Incrementa o contador de dígitos
+        test eax, eax        ; Verifica se o quociente é 0
+        jnz convert_loop     ; Continua se ainda houver dígitos
+    
+                             ; Após o loop, EDI aponta para o início da string, ECX contém o comprimento
+        ret
 
 torre_hanoi:
     cmp byte [num_disc], 1  ; Caso base da recursão vendo se so tem 1 disco
@@ -135,66 +140,72 @@ torre_hanoi:
         jmp concluido        ; Pulando para o final para printar a msg e retornar pro programa principal
         
     caso_recursivo:
-        
-        dec byte [num_disc] ; Decrescimento na quantidade de discos
-        
-        push word [num_disc] ; Coloca o valor da quantidade atual de discos na pilha, para a primeira recursão e suas "filhas" não interferirem na chamada atual da função
-
-        push word [torre_orig] ; Coloca o valor de coluna origem na pilha, para as recursões futuras não influenciarem nos valores da chamada atual da função
-        push word [torre_aux] ; Coloca o valor de coluna auxiliar na pilha, para as recursões futuras não influenciarem nos valores da chamada atual da função
-        push word [torre_dest] ; Coloca o valor de coluna destino na pilha, para as recursões futuras não influenciarem nos valores da chamada atual da função
-        
-        ; Trocando o valor da coluna auxiliar com o valor da coluna de destino
-        mov dx, [torre_aux] ; Armazena o valor da coluna auxiliar no registrador dx
-        mov cx, [torre_dest] ; Armazena o valor da coluna destino no registrador cx
-        mov [torre_dest], dx ; Move o valor de dx(coluna auxiliar) para a coluna destino
-        mov [torre_aux], cx ; Move o valor de cx(coluna destino) para a coluna auxiliar
-        
-        call torre_hanoi ; Recursão
-        
-        pop word [torre_dest] ; Obtém o valor de coluna destino na pilha, para as recursões passadas não influenciarem nos valores da chamada atual da função
-        pop word [torre_aux] ; Obtém o valor de coluna auxiliar na pilha, para as recursões passadas não influenciarem nos valores da chamada atual da função
-        pop word [torre_orig] ; Obtém o valor de coluna origem na pilha, para as recursões passadas não influenciarem nos valores da chamada atual da função
-        
-        pop word [num_disc] ; Obtém o valor guardado na pilha, para que as recursões anteriores não interfiram na recursão abaixo
-        
-        mov ecx, msg_mov1 ; Armazenar string em ecx
-        mov edx, len_msg_mov1
-        call print_string
-        
-        inc byte [num_disc] ; Aumento da quantidade de discos para o decréscimo anterior não influenciar na exibição do valor do disco que será movido
-        call print_disc ; Função que exibe a quantidade de discos atual, que também é o disco que está sendo movido, assumindo que o disco 1 é o menor e o número vai crescendo de acordo com o tamanho do disco
-        dec byte [num_disc] ; Decréscimo para retornar o valor anterior ao acréscimo que foi feito anteriormente
-        
-        mov ecx, msg_mov2 ; Armazenar string em ecx
-        mov edx, len_msg_mov2
-        call print_string
-        
-        mov ecx, torre_orig ; Move o valor da coluna origem para ecx
-        mov edx, len_torre_orig
-        call print_string
-        
-        mov ecx, msg_mov3 ; Armazenar string em ecx
-        mov edx, len_msg_mov3
-        call print_string
-        
-        mov ecx, torre_dest ; Move o valor da destino origem para ecx
-        mov edx, len_torre_dest
-        call print_string
-        
-        mov ecx, pular_linha ; Armazenar string em ecx, neste caso é uma quebra de linha
-        mov edx, len_pular_linha
-        call print_string
-        
-        ; Trocando o valor da coluna auxiliar com o valor da coluna de origem
-        mov dx, [torre_aux] ; Armazena o valor da coluna auxiliar no registrador dx
-        mov cx, [torre_orig] ; Armazena o valor da coluna origem no registrador cx
-        mov [torre_orig], dx ; Move o valor de cx(coluna origem) para a coluna auxiliar
-        mov [torre_aux], cx ; Move o valor de cx(coluna auxiliar) para a coluna origem
-        call torre_hanoi ; Recursão
+        ; Diminui o número de discos em 1
+        dec byte [num_disc]            ; Decresce o número de discos, preparando para trabalhar com o próximo subproblema menor
     
-    concluido:
-        ret
+        ; Salva o estado atual na pilha para preservar os valores durante a recursão
+        push word [num_disc]           ; Salva o número atual de discos na pilha
+        push word [torre_orig]         ; Salva a torre de origem na pilha
+        push word [torre_aux]          ; Salva a torre auxiliar na pilha
+        push word [torre_dest]         ; Salva a torre de destino na pilha
+    
+        ; Troca a torre auxiliar com a torre de destino para a próxima chamada recursiva
+        mov dx, [torre_aux]            ; Carrega o valor da torre auxiliar em `dx`
+        mov cx, [torre_dest]           ; Carrega o valor da torre de destino em `cx`
+        mov [torre_dest], dx           ; Atualiza a torre de destino com o valor da torre auxiliar
+        mov [torre_aux], cx            ; Atualiza a torre auxiliar com o valor da torre de destino
+    
+        ; Chama a função recursiva novamente com o novo estado
+        call torre_hanoi               ; Resolve o subproblema para mover `n-1` discos
+    
+        ; Restaura o estado anterior da pilha após a recursão
+        pop word [torre_dest]          ; Restaura a torre de destino da pilha
+        pop word [torre_aux]           ; Restaura a torre auxiliar da pilha
+        pop word [torre_orig]          ; Restaura a torre de origem da pilha
+        pop word [num_disc]            ; Restaura o número de discos da pilha
+    
+        ; Imprime a mensagem "Mova disco X da Torre Y para a Torre Z"
+        mov ecx, msg_mov1              ; Carrega a mensagem inicial "Mova disco"
+        mov edx, len_msg_mov1          ; Comprimento da mensagem
+        call print_string              ; Imprime a mensagem "Mova disco"
+    
+        inc byte [num_disc]            ; Incrementa o número de discos temporariamente para imprimir o disco correto
+        call print_disc                ; Imprime o número do disco a ser movido
+        dec byte [num_disc]            ; Volta o número de discos ao estado original
+    
+        mov ecx, msg_mov2              ; Carrega a mensagem "da Torre"
+        mov edx, len_msg_mov2          ; Comprimento da mensagem
+        call print_string              ; Imprime "da Torre"
+    
+        mov ecx, torre_orig            ; Carrega o identificador da torre de origem
+        mov edx, len_torre_orig        ; Comprimento do identificador
+        call print_string              ; Imprime o identificador da torre de origem
+    
+        mov ecx, msg_mov3              ; Carrega a mensagem "para a Torre"
+        mov edx, len_msg_mov3          ; Comprimento da mensagem
+        call print_string              ; Imprime "para a Torre"
+    
+        mov ecx, torre_dest            ; Carrega o identificador da torre de destino
+        mov edx, len_torre_dest        ; Comprimento do identificador
+        call print_string              ; Imprime o identificador da torre de destino
+    
+        mov ecx, pular_linha           ; Carrega a quebra de linha
+        mov edx, len_pular_linha       ; Comprimento da quebra de linha
+        call print_string              ; Imprime a quebra de linha
+    
+        ; Troca novamente a torre auxiliar com a torre de origem para preparar a próxima recursão
+        mov dx, [torre_aux]            ; Carrega o valor da torre auxiliar em `dx`
+        mov cx, [torre_orig]           ; Carrega o valor da torre de origem em `cx`
+        mov [torre_orig], dx           ; Atualiza a torre de origem com o valor da torre auxiliar
+        mov [torre_aux], cx            ; Atualiza a torre auxiliar com o valor da torre de origem
+    
+        ; Chama a função recursiva novamente para resolver o segundo subproblema
+        call torre_hanoi               ; Resolve o subproblema restante para mover `n-1` discos
+
+    concluido:                         ; Algoritmo concluído 
+        ret                            ; Retorno para onde o subprocedimento foi chamado
+        
+;Seção de dados já inicializados na memória
 section .data
     ; Inicializando as strings que serão usadas
     msg_ini1 db '---------------', 10
@@ -209,7 +220,7 @@ section .data
     len_msg_final equ $ - msg_final
     msg_alg1 db 'Algoritmo da Torre de Hanoi com '
     len_msg_alg1 equ $ - msg_alg1
-    msg_alg2 db ' discos', 10
+    msg_alg2 db ' disco(s)', 10
     len_msg_alg2 equ $ - msg_alg2
     torre_orig db 'A '
     len_torre_orig equ $ - torre_orig
@@ -227,6 +238,6 @@ section .data
     len_pular_linha equ $ - pular_linha
 
 section .bss
-    input resb 3      ; Buffer para armazenar a entrada do usuário (um ou dois dígitos + quebra de linha)
-    num_disc resb 1   ; Armazenamento do número de discos
-    len_buffer resb 2 ; Buffer para armazenar a comprimento da string
+    input resb 3      ; Buffer para armazenar a entrada do usuário 
+    num_disc resb 1   ; Armazenamento do número de discos como um número inteiro
+    buffer resb 2     ; Buffer para armazenar a string que vai ser printada sobre o número dos discos
