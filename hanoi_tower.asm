@@ -67,7 +67,7 @@ print_disc:
     mov ebx, 1                   ; Descritor de arquivo (stdout)
     lea ecx, [edi]               ; Carrega o endereço inicial da string convertida em ECX 
     lea edx, [buffer + 4]        ; Carrega o endereço final do buffer no registrador EDX
-    sub edx, edi                 ; Calcula o comprimento da string subtraindo os endereços (endereço final - endereço inicial = número de bits da string)
+    sub edx, edi                 ; Calcula o comprimento da string subtraindo os endereços (endereço final[edx] - endereço inicial[edi] = número de bits da string)
     int 0x80                     ; Chamar interrupção do sistema
     ret
 
@@ -77,9 +77,9 @@ string_to_int:
         cmp byte [esi], 0x0A       ; Verifica se o caractere atual é um '\n' (newline)
         je um_algarismo            ; Se for '\n', termina a conversão e vai para o fim
         movzx eax, byte [esi]      ; Carrega o caractere atual (1 byte) no registrador `eax`, expandindo com zeros
-        inc esi                    ; Move o ponteiro `esi` para o próximo caractere
+        inc esi                    ; Move o ponteiro `esi` para o próximo caractere pulando 8 bits
         sub al, '0'                ; Converte o caractere ASCII em seu valor numérico 
-        imul ebx, 0xA              ; Multiplica o valor acumulado em `ebx` por 10 (desloca para a esquerda em base decimal)
+        imul ebx, 0xA              ; Multiplica o valor acumulado em `ebx` por 10 (perceba que na primeira iteração o valor ainda é 0 em ebx)
         add ebx, eax               ; Adiciona o novo dígito convertido ao acumulador `ebx`
         loop prox_digito           ; Continua o loop enquanto o contador (ECX) não for zero
         mov eax, ebx               ; Move o valor final acumulado em `ebx` para `eax` (registrador de retorno padrão)
@@ -94,14 +94,14 @@ int_to_string:
     continuar_conv:
         xor edx, edx         ; Limpa registrado de resto da divisão
         div ebx              ; Divide EAX por 10 (EAX = quociente, EDX = resto)
-        add dl, '0'          ; Converte o dígito para ASCII
+        add dl, '0'          ; Converte o dígito de resto da divisão para ASCII (pelo dl que é o correspondente do edi)
         dec edi              ; Move para o próximo espaço no buffer (de trás para frente)
         mov [edi], dl        ; Armazena o dígito no buffer
         inc ecx              ; Incrementa o contador de dígitos
         test eax, eax        ; Verifica se o quociente é 0
-        jnz continuar_conv     ; Continua se ainda houver dígitos
+        jnz continuar_conv   ; Continua se ainda houver dígitos
     
-                             ; Após o loop, EDI aponta para o início da string, ECX contém o comprimento
+                             ; Após o loop, EDI aponta para o início da string formada e ECX contém o comprimento
         ret
 
 torre_hanoi:
