@@ -1,6 +1,6 @@
 # Projeto: Torre de Hanói em Assembly
 
-Este projeto implementa a solução do problema da Torre de Hanói usando a linguagem Assembly.
+Este projeto implementa a solução do problema da Torre de Hanói usando recursão com a linguagem Assembly.
 
 ## Descrição
 
@@ -11,6 +11,18 @@ A Torre de Hanói é um desafio matemático que consiste em mover uma pilha de d
 3. Um disco maior nunca pode ficar em cima de um disco menor.
 
 Este programa resolve o problema de forma recursiva, exibindo os movimentos necessários para transferir todos os discos.
+
+## Algoritmo recursivo da Torre de Hanói
+
+A Torre de Hanói é um exemplo clássico de problema que pode ser resolvido usando recursão. A solução recursiva é baseada em dividir o problema em partes menores até alcançar o caso mais simples: mover apenas um disco.
+
+Basicamente para mover n discos da torre de origem para a torre de destino:
+
+1. Primeiro, os n-1 discos superiores são movidos para a torre intermediária, usando a torre de destino como auxiliar.
+2. Depois, o maior disco (o último da base) é movido diretamente para a torre de destino.
+3. Por fim, os n-1 discos são movidos da torre intermediária para a torre de destino, usando a torre de origem como auxiliar.
+   
+A cada etapa, o problema é reduzido até que reste apenas um disco, momento em que o movimento é direto.
 
 ## Como Testar
 
