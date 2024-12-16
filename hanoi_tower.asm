@@ -91,7 +91,7 @@ int_to_string:
     xor edx, edx             ; Limpa EDX para divisão
     mov ebx, 10              ; Divisor decimal para extrair dígitos
 
-    convert_loop:
+    continuar_conv:
         xor edx, edx         ; Limpa registrado de resto da divisão
         div ebx              ; Divide EAX por 10 (EAX = quociente, EDX = resto)
         add dl, '0'          ; Converte o dígito para ASCII
@@ -99,7 +99,7 @@ int_to_string:
         mov [edi], dl        ; Armazena o dígito no buffer
         inc ecx              ; Incrementa o contador de dígitos
         test eax, eax        ; Verifica se o quociente é 0
-        jnz convert_loop     ; Continua se ainda houver dígitos
+        jnz continuar_conv     ; Continua se ainda houver dígitos
     
                              ; Após o loop, EDI aponta para o início da string, ECX contém o comprimento
         ret
