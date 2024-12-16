@@ -1,4 +1,9 @@
-# Projeto: Torre de Hanói em Assembly
+# Projeto: Torre de Hanói em Assembly - Arquitetura de Computadores e Sistemas Operacionais ( Docente: Sérgio Vanderlei Cavalcante )
+
+Discentes:
+
+. Juan Henrique Carneiro Aguiar Paes
+. Levi Do Rego Barros Serrano
 
 Este projeto implementa a solução do problema da Torre de Hanói usando recursão com a linguagem Assembly.
 
