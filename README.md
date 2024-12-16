@@ -14,8 +14,8 @@ Este programa resolve o problema de forma recursiva, exibindo os movimentos nece
 
 ## Como Testar
 
-1. Copie o código-fonte fornecido.
-2. Cole o código no ambiente do compilador "[tutorialspoint](https://www.tutorialspoint.com/compile_assembly_online.php)".
+1. Copie o código-fonte fornecido em "hanoi_tower.asm".
+2. Cole o código no ambiente do compilador [tutorialspoint](https://www.tutorialspoint.com/compile_assembly_online.php).
 3. Compile e execute o programa.
 4. Digite a quantidade de discos de até 2 algarismos.
 
