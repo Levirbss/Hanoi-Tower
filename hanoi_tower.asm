@@ -238,6 +238,6 @@ section .data
     len_pular_linha equ $ - pular_linha
 
 section .bss
-    input resb 3      ; Buffer para armazenar a entrada do usuário 
+    input resb 2      ; Buffer para armazenar a entrada do usuário 
     num_disc resb 1   ; Armazenamento do número de discos como um número inteiro
     buffer resb 2     ; Buffer para armazenar a string que vai ser printada sobre o número dos discos
