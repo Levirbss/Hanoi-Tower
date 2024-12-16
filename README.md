@@ -2,8 +2,8 @@
 
 Discentes:
 
-. Juan Henrique Carneiro Aguiar Paes
-. Levi Do Rego Barros Serrano
+1. Juan Henrique Carneiro Aguiar Paes
+2. Levi Do Rego Barros Serrano
 
 Este projeto implementa a solução do problema da Torre de Hanói usando recursão com a linguagem Assembly.
 
