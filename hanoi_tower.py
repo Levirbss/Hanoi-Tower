@@ -14,4 +14,4 @@ print(f"Algoritmo da Torre de Hanoi com {discos} discos")
 
 hanoi_solution(discos)
 
-print("--------------\n   Concluido!\n--------------")
+print("----------------\n   Concluido!\n----------------")
