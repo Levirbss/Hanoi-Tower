@@ -41,18 +41,18 @@ A cada etapa, o problema é reduzido até que reste apenas um disco, momento em 
 Se você executar o programa com 3 discos, a saída será semelhante a:
 
 ```
----------------
-Torre de Hanoi
----------------
-Digite um número de discos (com no máximo 2 algarismos):3
+----------------
+ Torre de Hanoi
+----------------
+Digite o número de discos (com no máximo 2 algarismos):3
 Algoritmo da Torre de Hanoi com 3 disco(s)
-Mova disco 1 da Torre A para a Torre C 
+Mova disco 1 da Torre A para a Torre C
 Mova disco 2 da Torre A para a Torre B
-Mova disco 1 da Torre C para a Torre B 
-Mova disco 3 da Torre A para a Torre C 
-Mova disco 1 da Torre B para a Torre A 
-Mova disco 2 da Torre B para a Torre C 
-Mova disco 1 da Torre A para a Torre C 
+Mova disco 1 da Torre C para a Torre B
+Mova disco 3 da Torre A para a Torre C
+Mova disco 1 da Torre B para a Torre A
+Mova disco 2 da Torre B para a Torre C
+Mova disco 1 da Torre A para a Torre C
 ----------------
    Concluido!
 ----------------
